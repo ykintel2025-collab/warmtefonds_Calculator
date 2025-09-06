@@ -3,135 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warmtefonds Rekenvoorbeeld</title>
+    <title>Tidio Chat Button</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            padding: 20px;
-        }
-        .calculator-container {
-            max-width: 600px;
-            margin: auto;
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #333;
-        }
-        input[type="number"], select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        .info-text {
-            font-size: 0.9em;
-            color: #666;
-            margin-top: 5px;
-        }
-        .result-box {
-            background-color: #e6f7e6;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #a3e0a3;
-            text-align: center;
-            margin-top: 20px;
-        }
-        .result-box h3 {
-            margin-top: 0;
-            color: #333;
-        }
-        .result-amount {
-            font-size: 2em;
-            color: #2e7d32;
-            font-weight: bold;
-        }
-        .hidden {
-            display: none;
-        }
-        .cta-button {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            text-align: center;
-            background-color: #2e7d32;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 1.1em;
-            margin-top: 20px;
-            transition: background-color 0.3s;
-        }
-        .cta-button:hover {
-            background-color: #1e5a22;
-        }
-        .info-section {
-            background-color: #f8f8f8;
-            border-left: 3px solid #2e7d32;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        .income-options {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
             display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        .income-option-btn {
-            flex: 1;
-            padding: 10px;
-            background-color: #f0f0f0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            cursor: pointer;
-            text-align: center;
-            transition: background-color 0.3s, border-color 0.3s;
-        }
-        .income-option-btn.active {
-            background-color: #e6f7e6;
-            border-color: #2e7d32;
-            font-weight: bold;
-        }
-        .details-container {
-            margin-top: 15px;
-            border-top: 1px dashed #ccc;
-            padding-top: 15px;
-            text-align: left;
-        }
-        .details-container p {
-            margin: 5px 0;
-            font-size: 1em;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
         }
     </style>
 </head>
-<body>
-
-<div class="calculator-container">
-    <h2>Rekenvoorbeeld Energiebespaarlening</h2>
-    <p>Bereken eenvoudig je maandtermijn voor een Energiebespaarlening van het Warmtefonds.</p>
-    
-    <div class="info-section">
-        <p>De rente op de Energiebespaarlening is afhankelijk van je gezamenlijk verzamelinkomen. Bij een inkomen tot **€ 60.000** betaal je **0% rente**. Is je inkomen hoger, dan wordt er een variabele rente gerekend, die vaststaat gedurende de gehele looptijd.</p>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="text-center p-8 bg-white rounded-lg shadow-xl max-w-sm w-full">
+        <!-- Knop om Tidio-chat te openen -->
+        <button id="openTidioChat" class="w-full bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+            Open Chat
+        </button>
     </div>
 
-    <div class="form-group">
-        <label>Wat is uw gezamenlijk verzamelinkomen?</label>
-        <div class="income-options">
-            <button type="button" class="income-option-btn active" data-income-level="low">Tot €60.000</button>
-            <button type="button" class="income-option-btn" data-income-level="high">Boven €60.000</button>
-        </div>
-    </div>
+    <!-- Tidio Chat Code (vervang met je eigen code van Tidio) -->
+    <script src="//code.tidio.co/YOUR_PUBLIC_KEY.js" async></script>
     
-    <div class="form-group hidden" id="income-range-group">
-        <label for="income-range">Kies uw inkomensgroep:</label>
-        <select id="income-range">
-            <option value="60-
+    <script>
+        // De JavaScript-code om de chat te openen.
+        // Zorg ervoor dat de Tidio-widget klaar is voordat we de functie aanroepen.
+        window.onload = function() {
+            if (window.tidioChatApi) {
+                // Wacht tot de Tidio-widget geladen is
+                window.tidioChatApi.on('ready', function() {
+                    const chatButton = document.getElementById('openTidioChat');
+                    if (chatButton) {
+                        chatButton.addEventListener('click', function() {
+                            // Roep de 'open'-methode aan om de chat te openen
+                            window.tidioChatApi.open();
+                        });
+                    }
+                });
+            }
+        };
+    </script>
+</body>
+</html>
