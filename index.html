@@ -101,16 +101,6 @@
             border-color: #2e7d32;
             font-weight: bold;
         }
-        .details-container {
-            margin-top: 15px;
-            border-top: 1px dashed #ccc;
-            padding-top: 15px;
-            text-align: left;
-        }
-        .details-container p {
-            margin: 5px 0;
-            font-size: 1em;
-        }
     </style>
 </head>
 <body>
@@ -159,12 +149,7 @@
     <div class="result-box">
         <h3>Geschatte maandtermijn:</h3>
         <p class="result-amount" id="monthly-payment">€ 0,00</p>
-        
-        <div class="details-container">
-            <p id="loan-details"></p>
-            <p id="interest-details"></p>
-        </div>
-        
+        <p class="info-text" id="interest-rate-info"></p>
         <p class="info-text" id="disclaimer"></p>
     </div>
     
@@ -187,8 +172,7 @@
         const loanAmountInput = document.getElementById('loan-amount');
         const loanTermSelect = document.getElementById('loan-term');
         const monthlyPaymentOutput = document.getElementById('monthly-payment');
-        const loanDetailsOutput = document.getElementById('loan-details');
-        const interestDetailsOutput = document.getElementById('interest-details');
+        const interestRateInfo = document.getElementById('interest-rate-info');
         const disclaimerText = document.getElementById('disclaimer');
 
         let currentIncomeLevel = 'low';
@@ -211,15 +195,13 @@
 
             if (loanAmount < 1000 || loanAmount > 28000) {
                 monthlyPaymentOutput.textContent = '€ 0,00';
-                loanDetailsOutput.textContent = '';
-                interestDetailsOutput.textContent = '';
+                interestRateInfo.textContent = '';
                 disclaimerText.textContent = 'Vul een leenbedrag in tussen €1.000 en €28.000.';
                 return;
             }
             if (loanTerm === 20 && loanAmount <= 15000) {
                 monthlyPaymentOutput.textContent = '€ 0,00';
-                loanDetailsOutput.textContent = '';
-                interestDetailsOutput.textContent = '';
+                interestRateInfo.textContent = '';
                 disclaimerText.textContent = 'Een looptijd van 20 jaar is alleen mogelijk bij een leenbedrag boven de €15.000.';
                 return;
             }
@@ -231,44 +213,30 @@
             if (incomeGroup === 'low') {
                 monthlyRate = 0;
                 annualRate = 0;
-                disclaimerText.textContent = 'Dit is een rentevrije lening (0% rente). Je betaalt alleen de aflossing.';
+                interestRateInfo.textContent = 'Rente: 0,00%';
+                disclaimerText.textContent = 'Dit is een rentevrije lening. Je betaalt alleen de aflossing.';
             } else {
                 annualRate = interestRates[incomeGroup][loanTerm] || 0;
                 monthlyRate = annualRate / 12;
+                interestRateInfo.textContent = `Rente: ${(annualRate * 100).toFixed(2)}%`;
                 disclaimerText.textContent = 'Deze berekening is een schatting. De actuele rentetarieven kunnen afwijken.';
             }
 
             const numberOfPayments = loanTerm * 12;
             let monthlyPayment;
-            let totalInterestPaid = 0;
 
             if (monthlyRate === 0) {
                 monthlyPayment = loanAmount / numberOfPayments;
-                totalInterestPaid = 0;
             } else {
                 monthlyPayment = (loanAmount * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -numberOfPayments));
-                totalInterestPaid = (monthlyPayment * numberOfPayments) - loanAmount;
             }
             
-            const annualInterest = totalInterestPaid / loanTerm;
-            const annualAflossing = loanAmount / loanTerm;
-
             if (!isFinite(monthlyPayment)) {
                 monthlyPaymentOutput.textContent = '€ 0,00';
-                loanDetailsOutput.textContent = '';
-                interestDetailsOutput.textContent = '';
+                interestRateInfo.textContent = '';
                 disclaimerText.textContent = 'Controleer je invoer. De berekening is niet mogelijk.';
             } else {
                 monthlyPaymentOutput.textContent = `€ ${monthlyPayment.toFixed(2).replace('.', ',')}`;
-
-                if (annualInterest > 0) {
-                    const totalPayment = monthlyPayment * numberOfPayments;
-                    loanDetailsOutput.innerHTML = `**Termijnbedrag**<br>Jaarlijkse aflossing: € ${annualAflossing.toFixed(2).replace('.', ',')}`;
-                    interestDetailsOutput.innerHTML = `<span style="color: #2e7d32; font-weight: bold;">Rente (${(annualRate * 100).toFixed(2)}%):</span><br>Jaarlijkse rentekosten: € ${annualInterest.toFixed(2).replace('.', ',')}`;
-                } else {
-                    loanDetailsOutput.textContent = `Jaarlijkse aflossing: € ${annualAflossing.toFixed(2).replace('.', ',')}`;
-                    interestDetailsOutput.textContent = 'Rente: 0,00%';
-                }
             }
         }
 
