@@ -149,3 +149,104 @@
         <p class="info-text" id="interest-rate-info"></p>
         <p class="info-text" id="disclaimer"></p>
     </div>
+    
+    <a href="https://aanvraag.warmtefonds.nl/1?substep=0" class="cta-button" target="_blank">Direct aanvragen</a>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // BELANGRIJK: Pas deze rentetarieven aan met de meest actuele tarieven van het Warmtefonds
+        const interestRates = {
+            'low': 0.0,
+            '60-70k': { '7': 0.0250, '10': 0.0260, '15': 0.0270, '20': 0.0280 },
+            '70-80k': { '7': 0.0300, '10': 0.0310, '15': 0.0320, '20': 0.0330 },
+            '80k-plus': { '7': 0.0350, '10': 0.0360, '15': 0.0370, '20': 0.0380 }
+        };
+
+        const incomeButtons = document.querySelectorAll('.income-option-btn');
+        const incomeRangeGroup = document.getElementById('income-range-group');
+        const incomeRangeSelect = document.getElementById('income-range');
+        const loanAmountInput = document.getElementById('loan-amount');
+        const loanTermSelect = document.getElementById('loan-term');
+        const monthlyPaymentOutput = document.getElementById('monthly-payment');
+        const interestRateInfo = document.getElementById('interest-rate-info');
+        const disclaimerText = document.getElementById('disclaimer');
+
+        let currentIncomeLevel = 'low';
+
+        function updateIncomeSelection(event) {
+            incomeButtons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            currentIncomeLevel = event.target.dataset.incomeLevel;
+            if (currentIncomeLevel === 'high') {
+                incomeRangeGroup.classList.remove('hidden');
+            } else {
+                incomeRangeGroup.classList.add('hidden');
+            }
+            calculateMonthlyPayment();
+        }
+
+        function calculateMonthlyPayment() {
+            const loanAmount = parseFloat(loanAmountInput.value);
+            const loanTerm = parseInt(loanTermSelect.value);
+
+            if (loanAmount < 1000 || loanAmount > 28000) {
+                monthlyPaymentOutput.textContent = '€ 0,00';
+                interestRateInfo.textContent = '';
+                disclaimerText.textContent = 'Vul een leenbedrag in tussen €1.000 en €28.000.';
+                return;
+            }
+            if (loanTerm === 20 && loanAmount <= 15000) {
+                monthlyPaymentOutput.textContent = '€ 0,00';
+                interestRateInfo.textContent = '';
+                disclaimerText.textContent = 'Een looptijd van 20 jaar is alleen mogelijk bij een leenbedrag boven de €15.000.';
+                return;
+            }
+
+            let monthlyRate = 0;
+            let annualRate = 0;
+            let incomeGroup = currentIncomeLevel === 'high' ? incomeRangeSelect.value : 'low';
+
+            if (incomeGroup === 'low') {
+                monthlyRate = 0;
+                annualRate = 0;
+                interestRateInfo.textContent = `Jaarlijkse rente: 0,00%`;
+                disclaimerText.textContent = 'Dit is een rentevrije lening (0% rente). Je betaalt alleen de aflossing.';
+            } else {
+                annualRate = interestRates[incomeGroup][loanTerm] || 0;
+                monthlyRate = annualRate / 12;
+                interestRateInfo.textContent = `Jaarlijkse rente: ${(annualRate * 100).toFixed(2)}%`;
+                disclaimerText.textContent = 'Deze berekening is een schatting. De actuele rentetarieven kunnen afwijken.';
+            }
+
+            const numberOfPayments = loanTerm * 12;
+
+            let monthlyPayment;
+            if (monthlyRate === 0) {
+                monthlyPayment = loanAmount / numberOfPayments;
+            } else {
+                monthlyPayment = (loanAmount * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -numberOfPayments));
+            }
+
+            if (!isFinite(monthlyPayment)) {
+                monthlyPaymentOutput.textContent = '€ 0,00';
+                interestRateInfo.textContent = '';
+                disclaimerText.textContent = 'Controleer je invoer. De berekening is niet mogelijk.';
+            } else {
+                monthlyPaymentOutput.textContent = `€ ${monthlyPayment.toFixed(2).replace('.', ',')}`;
+            }
+        }
+
+        // Voeg event listeners toe
+        incomeButtons.forEach(btn => btn.addEventListener('click', updateIncomeSelection));
+        incomeRangeSelect.addEventListener('change', calculateMonthlyPayment);
+        loanAmountInput.addEventListener('input', calculateMonthlyPayment);
+        loanTermSelect.addEventListener('change', calculateMonthlyPayment);
+
+        // Voer initiële berekening uit
+        calculateMonthlyPayment();
+    });
+</script>
+
+</body>
+</html>
