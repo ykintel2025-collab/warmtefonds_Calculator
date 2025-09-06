@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #f0f0f0;
             padding: 20px;
         }
         .calculator-container {
@@ -25,11 +25,12 @@
             display: block;
             margin-bottom: 8px;
             font-weight: bold;
+            color: #333;
         }
         input[type="number"], select {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
         }
@@ -39,10 +40,10 @@
             margin-top: 5px;
         }
         .result-box {
-            background-color: #e9f5e9;
+            background-color: #e6f7e6;
             padding: 20px;
             border-radius: 8px;
-            border: 1px solid #d4eac2;
+            border: 1px solid #a3e0a3;
             text-align: center;
             margin-top: 20px;
         }
@@ -63,19 +64,20 @@
             width: 100%;
             padding: 15px;
             text-align: center;
-            background-color: #007bff;
+            background-color: #2e7d32;
             color: white;
             text-decoration: none;
             border-radius: 4px;
             font-size: 1.1em;
             margin-top: 20px;
+            transition: background-color 0.3s;
         }
         .cta-button:hover {
-            background-color: #0056b3;
+            background-color: #1e5a22;
         }
         .info-section {
             background-color: #f8f8f8;
-            border-left: 3px solid #007bff;
+            border-left: 3px solid #2e7d32;
             padding: 15px;
             margin-bottom: 20px;
         }
@@ -88,15 +90,26 @@
             flex: 1;
             padding: 10px;
             background-color: #f0f0f0;
-            border: 1px solid #ddd;
+            border: 1px solid #ccc;
             border-radius: 4px;
             cursor: pointer;
             text-align: center;
+            transition: background-color 0.3s, border-color 0.3s;
         }
         .income-option-btn.active {
-            background-color: #d4eac2;
+            background-color: #e6f7e6;
             border-color: #2e7d32;
             font-weight: bold;
+        }
+        .details-container {
+            margin-top: 15px;
+            border-top: 1px dashed #ccc;
+            padding-top: 15px;
+            text-align: left;
+        }
+        .details-container p {
+            margin: 5px 0;
+            font-size: 1em;
         }
     </style>
 </head>
@@ -107,7 +120,7 @@
     <p>Bereken eenvoudig je maandtermijn voor een Energiebespaarlening van het Warmtefonds.</p>
     
     <div class="info-section">
-        <p>De rente op de Energiebespaarlening is afhankelijk van je gezamenlijk verzamelinkomen. Bij een inkomen tot € 60.000 betaal je **0% rente**. Is je inkomen hoger, dan wordt er een variabele rente gerekend, die vaststaat gedurende de gehele looptijd.</p>
+        <p>De rente op de Energiebespaarlening is afhankelijk van je gezamenlijk verzamelinkomen. Bij een inkomen tot **€ 60.000** betaal je **0% rente**. Is je inkomen hoger, dan wordt er een variabele rente gerekend, die vaststaat gedurende de gehele looptijd.</p>
     </div>
 
     <div class="form-group">
@@ -121,132 +134,4 @@
     <div class="form-group hidden" id="income-range-group">
         <label for="income-range">Kies uw inkomensgroep:</label>
         <select id="income-range">
-            <option value="60-70k">€60.000 - €70.000</option>
-            <option value="70-80k">€70.000 - €80.000</option>
-            <option value="80k-plus">Meer dan €80.000</option>
-        </select>
-    </div>
-
-    <div class="form-group">
-        <label for="loan-amount">Gewenst leenbedrag (€):</label>
-        <input type="number" id="loan-amount" value="10000" min="1000" max="28000">
-        <p class="info-text">Minimaal €1.000 en maximaal €28.000.</p>
-    </div>
-
-    <div class="form-group">
-        <label for="loan-term">Looptijd (jaren):</label>
-        <select id="loan-term">
-            <option value="7">7 jaar</option>
-            <option value="10">10 jaar</option>
-            <option value="15">15 jaar</option>
-            <option value="20">20 jaar (alleen bij leenbedrag > €15.000)</option>
-        </select>
-    </div>
-
-    <div class="result-box">
-        <h3>Geschatte maandtermijn:</h3>
-        <p class="result-amount" id="monthly-payment">€ 0,00</p>
-        <p class="info-text" id="interest-rate-info"></p>
-        <p class="info-text" id="disclaimer"></p>
-    </div>
-    
-    <a href="https://aanvraag.warmtefonds.nl/1?substep=0" class="cta-button" target="_blank">Direct aanvragen</a>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // BELANGRIJK: Pas deze rentetarieven aan met de meest actuele tarieven van het Warmtefonds
-        const interestRates = {
-            'low': 0.0,
-            '60-70k': { '7': 0.0250, '10': 0.0260, '15': 0.0270, '20': 0.0280 },
-            '70-80k': { '7': 0.0300, '10': 0.0310, '15': 0.0320, '20': 0.0330 },
-            '80k-plus': { '7': 0.0350, '10': 0.0360, '15': 0.0370, '20': 0.0380 }
-        };
-
-        const incomeButtons = document.querySelectorAll('.income-option-btn');
-        const incomeRangeGroup = document.getElementById('income-range-group');
-        const incomeRangeSelect = document.getElementById('income-range');
-        const loanAmountInput = document.getElementById('loan-amount');
-        const loanTermSelect = document.getElementById('loan-term');
-        const monthlyPaymentOutput = document.getElementById('monthly-payment');
-        const interestRateInfo = document.getElementById('interest-rate-info');
-        const disclaimerText = document.getElementById('disclaimer');
-
-        let currentIncomeLevel = 'low';
-
-        function updateIncomeSelection(event) {
-            incomeButtons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            currentIncomeLevel = event.target.dataset.incomeLevel;
-            if (currentIncomeLevel === 'high') {
-                incomeRangeGroup.classList.remove('hidden');
-            } else {
-                incomeRangeGroup.classList.add('hidden');
-            }
-            calculateMonthlyPayment();
-        }
-
-        function calculateMonthlyPayment() {
-            const loanAmount = parseFloat(loanAmountInput.value);
-            const loanTerm = parseInt(loanTermSelect.value);
-
-            if (loanAmount < 1000 || loanAmount > 28000) {
-                monthlyPaymentOutput.textContent = '€ 0,00';
-                interestRateInfo.textContent = '';
-                disclaimerText.textContent = 'Vul een leenbedrag in tussen €1.000 en €28.000.';
-                return;
-            }
-            if (loanTerm === 20 && loanAmount <= 15000) {
-                monthlyPaymentOutput.textContent = '€ 0,00';
-                interestRateInfo.textContent = '';
-                disclaimerText.textContent = 'Een looptijd van 20 jaar is alleen mogelijk bij een leenbedrag boven de €15.000.';
-                return;
-            }
-
-            let monthlyRate = 0;
-            let annualRate = 0;
-            let incomeGroup = currentIncomeLevel === 'high' ? incomeRangeSelect.value : 'low';
-
-            if (incomeGroup === 'low') {
-                monthlyRate = 0;
-                annualRate = 0;
-                interestRateInfo.textContent = `Jaarlijkse rente: 0,00%`;
-                disclaimerText.textContent = 'Dit is een rentevrije lening (0% rente). Je betaalt alleen de aflossing.';
-            } else {
-                annualRate = interestRates[incomeGroup][loanTerm] || 0;
-                monthlyRate = annualRate / 12;
-                interestRateInfo.textContent = `Jaarlijkse rente: ${(annualRate * 100).toFixed(2)}%`;
-                disclaimerText.textContent = 'Deze berekening is een schatting. De actuele rentetarieven kunnen afwijken.';
-            }
-
-            const numberOfPayments = loanTerm * 12;
-
-            let monthlyPayment;
-            if (monthlyRate === 0) {
-                monthlyPayment = loanAmount / numberOfPayments;
-            } else {
-                monthlyPayment = (loanAmount * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -numberOfPayments));
-            }
-
-            if (!isFinite(monthlyPayment)) {
-                monthlyPaymentOutput.textContent = '€ 0,00';
-                interestRateInfo.textContent = '';
-                disclaimerText.textContent = 'Controleer je invoer. De berekening is niet mogelijk.';
-            } else {
-                monthlyPaymentOutput.textContent = `€ ${monthlyPayment.toFixed(2).replace('.', ',')}`;
-            }
-        }
-
-        // Voeg event listeners toe
-        incomeButtons.forEach(btn => btn.addEventListener('click', updateIncomeSelection));
-        incomeRangeSelect.addEventListener('change', calculateMonthlyPayment);
-        loanAmountInput.addEventListener('input', calculateMonthlyPayment);
-        loanTermSelect.addEventListener('change', calculateMonthlyPayment);
-
-        // Voer initiële berekening uit
-        calculateMonthlyPayment();
-    });
-</script>
-
-</body>
-</html>
+            <option value="60-
