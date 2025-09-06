@@ -58,6 +58,27 @@
         .hidden {
             display: none;
         }
+        .cta-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            text-align: center;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 1.1em;
+            margin-top: 20px;
+        }
+        .cta-button:hover {
+            background-color: #0056b3;
+        }
+        .info-section {
+            background-color: #f8f8f8;
+            border-left: 3px solid #007bff;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -65,13 +86,17 @@
 <div class="calculator-container">
     <h2>Rekenvoorbeeld Energiebespaarlening</h2>
     <p>Bereken eenvoudig je maandtermijn voor een Energiebespaarlening van het Warmtefonds.</p>
+    
+    <div class="info-section">
+        <p>De rente op de Energiebespaarlening is afhankelijk van je gezamenlijk verzamelinkomen. Bij een inkomen tot € 60.000 betaal je **0% rente**. Is je inkomen hoger, dan wordt er een variabele rente gerekend, die vaststaat gedurende de gehele looptijd.</p>
+    </div>
 
     <div class="form-group">
         <label for="income-over-60k">
             <input type="checkbox" id="income-over-60k">
-            Is uw gezamenlijk verzamelinkomen hoger dan €60.000 per jaar?
+            Is uw gezamenlijk verzamelinkomen hoger dan € 60.000 per jaar?
         </label>
-        <p class="info-text">Bij een inkomen tot €60.000 is de rente 0%.</p>
+        <p class="info-text">Bij een inkomen tot € 60.000 is de rente 0%.</p>
     </div>
     
     <div class="form-group hidden" id="income-range-group">
@@ -104,12 +129,15 @@
         <p class="result-amount" id="monthly-payment">€ 0,00</p>
         <p class="info-text" id="disclaimer"></p>
     </div>
+    
+    <a href="https://aanvraag.warmtefonds.nl/1?substep=0" class="cta-button" target="_blank">Direct aanvragen</a>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // BELANGRIJK: Pas deze rentetarieven aan met de meest actuele tarieven van het Warmtefonds
         const interestRates = {
-            'low': 0.0, // 0% rente
+            'low': 0.0,
             '60-70k': { '7': 0.0250, '10': 0.0260, '15': 0.0270, '20': 0.0280 },
             '70-80k': { '7': 0.0300, '10': 0.0310, '15': 0.0320, '20': 0.0330 },
             '80k-plus': { '7': 0.0350, '10': 0.0360, '15': 0.0370, '20': 0.0380 }
@@ -137,7 +165,6 @@
             const loanTerm = parseInt(loanTermSelect.value);
             const isHighIncome = incomeCheckbox.checked;
 
-            // Check voorwaarden
             if (loanAmount < 1000 || loanAmount > 28000) {
                 monthlyPaymentOutput.textContent = '€ 0,00';
                 disclaimerText.textContent = 'Vul een leenbedrag in tussen €1.000 en €28.000.';
@@ -179,13 +206,11 @@
             }
         }
 
-        // Voeg event listeners toe
         incomeCheckbox.addEventListener('change', toggleIncomeDropdown);
         incomeRangeSelect.addEventListener('change', calculateMonthlyPayment);
         loanAmountInput.addEventListener('input', calculateMonthlyPayment);
         loanTermSelect.addEventListener('change', calculateMonthlyPayment);
 
-        // Voer initiële berekening uit
         toggleIncomeDropdown();
     });
 </script>
