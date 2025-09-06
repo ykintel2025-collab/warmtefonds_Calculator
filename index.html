@@ -79,6 +79,25 @@
             padding: 15px;
             margin-bottom: 20px;
         }
+        .income-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .income-option-btn {
+            flex: 1;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .income-option-btn.active {
+            background-color: #d4eac2;
+            border-color: #2e7d32;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -92,11 +111,11 @@
     </div>
 
     <div class="form-group">
-        <label for="income-over-60k">
-            <input type="checkbox" id="income-over-60k">
-            Is uw gezamenlijk verzamelinkomen hoger dan € 60.000 per jaar?
-        </label>
-        <p class="info-text">Bij een inkomen tot € 60.000 is de rente 0%.</p>
+        <label>Wat is uw gezamenlijk verzamelinkomen?</label>
+        <div class="income-options">
+            <button type="button" class="income-option-btn active" data-income-level="low">Tot €60.000</button>
+            <button type="button" class="income-option-btn" data-income-level="high">Boven €60.000</button>
+        </div>
     </div>
     
     <div class="form-group hidden" id="income-range-group">
@@ -127,93 +146,6 @@
     <div class="result-box">
         <h3>Geschatte maandtermijn:</h3>
         <p class="result-amount" id="monthly-payment">€ 0,00</p>
+        <p class="info-text" id="interest-rate-info"></p>
         <p class="info-text" id="disclaimer"></p>
     </div>
-    
-    <a href="https://aanvraag.warmtefonds.nl/1?substep=0" class="cta-button" target="_blank">Direct aanvragen</a>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // BELANGRIJK: Pas deze rentetarieven aan met de meest actuele tarieven van het Warmtefonds
-        const interestRates = {
-            'low': 0.0,
-            '60-70k': { '7': 0.0250, '10': 0.0260, '15': 0.0270, '20': 0.0280 },
-            '70-80k': { '7': 0.0300, '10': 0.0310, '15': 0.0320, '20': 0.0330 },
-            '80k-plus': { '7': 0.0350, '10': 0.0360, '15': 0.0370, '20': 0.0380 }
-        };
-
-        const incomeCheckbox = document.getElementById('income-over-60k');
-        const incomeRangeGroup = document.getElementById('income-range-group');
-        const incomeRangeSelect = document.getElementById('income-range');
-        const loanAmountInput = document.getElementById('loan-amount');
-        const loanTermSelect = document.getElementById('loan-term');
-        const monthlyPaymentOutput = document.getElementById('monthly-payment');
-        const disclaimerText = document.getElementById('disclaimer');
-
-        function toggleIncomeDropdown() {
-            if (incomeCheckbox.checked) {
-                incomeRangeGroup.classList.remove('hidden');
-            } else {
-                incomeRangeGroup.classList.add('hidden');
-            }
-            calculateMonthlyPayment();
-        }
-
-        function calculateMonthlyPayment() {
-            const loanAmount = parseFloat(loanAmountInput.value);
-            const loanTerm = parseInt(loanTermSelect.value);
-            const isHighIncome = incomeCheckbox.checked;
-
-            if (loanAmount < 1000 || loanAmount > 28000) {
-                monthlyPaymentOutput.textContent = '€ 0,00';
-                disclaimerText.textContent = 'Vul een leenbedrag in tussen €1.000 en €28.000.';
-                return;
-            }
-            if (loanTerm === 20 && loanAmount <= 15000) {
-                monthlyPaymentOutput.textContent = '€ 0,00';
-                disclaimerText.textContent = 'Een looptijd van 20 jaar is alleen mogelijk bij een leenbedrag boven de €15.000.';
-                return;
-            }
-
-            let monthlyRate = 0;
-            let annualRate = 0;
-            let incomeGroup = isHighIncome ? incomeRangeSelect.value : 'low';
-
-            if (incomeGroup === 'low') {
-                monthlyRate = 0;
-                disclaimerText.textContent = 'Dit is een rentevrije lening (0% rente). Je betaalt alleen de aflossing.';
-            } else {
-                annualRate = interestRates[incomeGroup][loanTerm] || 0;
-                monthlyRate = annualRate / 12;
-                disclaimerText.textContent = `Deze berekening is gebaseerd op een jaarlijkse rente van ${(annualRate * 100).toFixed(2)}%. De actuele rentetarieven kunnen afwijken.`;
-            }
-
-            const numberOfPayments = loanTerm * 12;
-
-            let monthlyPayment;
-            if (monthlyRate === 0) {
-                monthlyPayment = loanAmount / numberOfPayments;
-            } else {
-                monthlyPayment = (loanAmount * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -numberOfPayments));
-            }
-
-            if (!isFinite(monthlyPayment)) {
-                monthlyPaymentOutput.textContent = '€ 0,00';
-                disclaimerText.textContent = 'Controleer je invoer. De berekening is niet mogelijk.';
-            } else {
-                monthlyPaymentOutput.textContent = `€ ${monthlyPayment.toFixed(2).replace('.', ',')}`;
-            }
-        }
-
-        incomeCheckbox.addEventListener('change', toggleIncomeDropdown);
-        incomeRangeSelect.addEventListener('change', calculateMonthlyPayment);
-        loanAmountInput.addEventListener('input', calculateMonthlyPayment);
-        loanTermSelect.addEventListener('change', calculateMonthlyPayment);
-
-        toggleIncomeDropdown();
-    });
-</script>
-
-</body>
-</html>
